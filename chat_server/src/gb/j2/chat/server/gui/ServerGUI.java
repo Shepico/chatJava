@@ -72,9 +72,6 @@ public class ServerGUI extends JFrame implements ActionListener, ChatServerListe
     public void uncaughtException(Thread t, Throwable e) {
         String msg = "Что то пошло не так";
         LOG.append(msg + ": " + e.toString());
-        //e.printStackTrace();
-        //JOptionPane.showMessageDialog(this, msg, "Alert", JOptionPane.ERROR_MESSAGE);
-        //System.exit(1);
     }
 
     @Override
