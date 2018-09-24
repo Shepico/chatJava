@@ -9,8 +9,8 @@ import java.awt.event.ActionListener;
 public class ServerGUI extends JFrame implements ActionListener, ChatServerListener, Thread.UncaughtExceptionHandler {
     private final int POS_X = 500;
     private final int POS_Y = 300;
-    private final int WIDTH = 600;
-    private final int HEIGHT = 400;
+    private final int WIDTH = 400;
+    private final int HEIGHT = 300;
 
     private final ChatServer CHATSERVER = new ChatServer(this);
     private final JButton BTNSTART = new JButton("Start");
@@ -43,10 +43,11 @@ public class ServerGUI extends JFrame implements ActionListener, ChatServerListe
         PANEL_BTN.add(BTNSTART);
         PANEL_BTN.add(BTNSTOP);
         PANEL.setLayout(new BorderLayout());
-        PANEL.add(PANEL_BTN,BorderLayout.NORTH);
+        PANEL.add(PANEL_BTN,BorderLayout.SOUTH);
         LOG.setLineWrap(true);
         LOG.setCaretPosition(LOG.getDocument().getLength());
-        PANEL.add(LOG,BorderLayout.SOUTH);
+        JScrollPane scrollLog = new JScrollPane(LOG);
+        PANEL.add(scrollLog,BorderLayout.CENTER);
         add(PANEL);
 
         //add(BTNSTART);
