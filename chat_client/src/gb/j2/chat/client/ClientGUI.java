@@ -8,9 +8,11 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
+import java.io.*;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.Arrays;
 
 public class ClientGUI extends JFrame implements ActionListener, Thread.UncaughtExceptionHandler, SocketThreadListener {
@@ -35,6 +37,9 @@ public class ClientGUI extends JFrame implements ActionListener, Thread.Uncaught
     private boolean shownIoErrors = false;
     private SocketThread socketThread;
 
+    private BufferedWriter bwFile;
+    private BufferedReader brFile;
+
     public static void main(String[] args) {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
@@ -50,6 +55,60 @@ public class ClientGUI extends JFrame implements ActionListener, Thread.Uncaught
         setLocationRelativeTo(null);
         setSize(WIDTH, HEIGHT);
         setTitle("Chat Client");
+        addWindowListener(new WindowListener() { // для работы с файлом
+            @Override
+            public void windowOpened(WindowEvent e) {
+                try {
+                    File file = new File("history.txt");
+                    if (file.exists()) {
+                        brFile = new BufferedReader(new FileReader("history.txt"));
+                        bwFile = new BufferedWriter(new FileWriter("history.txt", true));
+                    } else {
+                        file.createNewFile();
+                        brFile = new BufferedReader(new FileReader("history.txt"));
+                        bwFile = new BufferedWriter(new FileWriter("history.txt"));
+                        //System.out.println("Файл не существует.");
+                    }
+
+                }catch (IOException err) {
+                    putLog (err.getMessage());
+                }
+            }
+
+            @Override
+            public void windowClosing(WindowEvent e) {
+                try {
+                    bwFile.close();
+                }catch (IOException err) {
+                    putLog(err.getMessage());
+                }
+
+            }
+            @Override
+            public void windowClosed(WindowEvent e) {
+
+            }
+
+            @Override
+            public void windowIconified(WindowEvent e) {
+
+            }
+
+            @Override
+            public void windowDeiconified(WindowEvent e) {
+
+            }
+
+            @Override
+            public void windowActivated(WindowEvent e) {
+
+            }
+
+            @Override
+            public void windowDeactivated(WindowEvent e) {
+
+            }
+        });
 
         log.setEditable(false);
         log.setLineWrap(true);
@@ -79,7 +138,9 @@ public class ClientGUI extends JFrame implements ActionListener, Thread.Uncaught
         add(scrollLog, BorderLayout.CENTER);
         add(panelBottom, BorderLayout.SOUTH);
         add(scrollUsers, BorderLayout.EAST);
-        visiblePanels(false); // lesson6
+        visiblePanels(false);
+
+        setLocationRelativeTo(null);
         setVisible(true);
     }
 
@@ -130,6 +191,12 @@ public class ClientGUI extends JFrame implements ActionListener, Thread.Uncaught
     * */
 
     private void disconnect() {
+        try {
+            bwFile.close();
+        }catch (IOException e) {
+            putLog(e.getMessage());
+        }
+
         socketThread.close();
 
     }
@@ -177,6 +244,34 @@ public class ClientGUI extends JFrame implements ActionListener, Thread.Uncaught
         });
     }
 
+    //запись в файл
+    private void putFile(String msg) {
+        try {
+            bwFile.write(msg + "\n");
+        }catch (IOException e) {
+            putLog (e.getMessage());
+        }
+    }
+
+    //Вывод из файла
+    private void getFile () {
+        try {
+            ArrayList<String> strArr = new ArrayList<>();
+            String str;
+            while ((str = brFile.readLine()) != null) {
+                strArr.add(str);
+            }
+            if (strArr.size()>100) {
+                for (int i=strArr.size()-100; i<strArr.size() ;i++) {
+                    putLog(strArr.get(i));
+                }
+            }
+
+        }catch (IOException e) {
+            //не чего
+        }
+    }
+
     /**
      * Socket Thread Events
      * */
@@ -201,11 +296,14 @@ public class ClientGUI extends JFrame implements ActionListener, Thread.Uncaught
         switch (arr[0]){
             case Messages.AUTH_ACCEPT:{
                 putLog("Вы авторизованы " + arr[1]);
+                getFile();  // вывод из файла
                 break;
             }
             case Messages.BROADCAST: {
                 //putLog("От:" + arr[2] + " всем: " + arr[3]);
                 putLog(arr[3]);
+                putFile(arr[3]); //запись в файл
+                //
                 break;
             }
 
