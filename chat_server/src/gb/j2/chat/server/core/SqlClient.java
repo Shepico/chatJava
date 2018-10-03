@@ -26,7 +26,7 @@ public class SqlClient {
         }
     }
 
-    synchronized static String getNickname(String login, String password) {
+   synchronized static String getNickname(String login, String password) {
         String request = String.format("select nickname from users where login='%s' and password='%s'", login, password);
         try (ResultSet set = statement.executeQuery(request)) {
             if (set.next()) {
@@ -36,5 +36,27 @@ public class SqlClient {
             throw new RuntimeException(e);
         }
         return null;
+    }
+
+    /////////// Смена НИКа ////////////
+    synchronized static boolean changeNickname (String login, String password, String newNickname) {
+
+        String request = String.format("select nickname from users where nickname='%s'", newNickname);
+        String requestUpdate = String.format("UPDATE users SET nickname='%s' where login='%s' and password='%s'",newNickname,login,password);
+        // проверка уникальности ника
+        try {
+            ResultSet set = statement.executeQuery(request); //проверим ник на совпадение
+            set.last();
+            int size = set.getRow();
+
+            if (size != 0) {
+                return false;
+            }
+
+            statement.executeUpdate(requestUpdate);
+            return true;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

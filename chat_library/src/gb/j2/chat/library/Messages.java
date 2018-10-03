@@ -16,6 +16,7 @@ public class Messages {
     public static final String BROADCAST = "/bcast";
     public static final String MESSAGE_FORMAT_ERROR = "/msg_fmt_err";
     public static final String USER_LIST = "/user_list";
+    public static final String GET_NICK = "/get_nick";
 
     public static String getAuthRequest(String login, String password) {
         return AUTH_REQUEST + DELIMITER + login + DELIMITER + password;
@@ -40,4 +41,7 @@ public class Messages {
 
     public static String getUserList(String list) {        return USER_LIST + DELIMITER + list;    }
 
+    public static String getNick(String nickname) {
+        return GET_NICK + DELIMITER + nickname;
+    }
 }

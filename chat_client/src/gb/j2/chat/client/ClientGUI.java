@@ -29,7 +29,8 @@ public class ClientGUI extends JFrame implements ActionListener, Thread.Uncaught
     private final JButton btnLogin = new JButton("Login");
 
     private final JPanel panelBottom = new JPanel(new BorderLayout());
-    private final JButton btnDisconnect = new JButton("<html><b>Disconnect</b></html>");
+    private final JButton btnDisconnect = new JButton("Disconnect");
+    private final JButton btnChangeNickname = new JButton("Change nick");
     private final JTextField tfMessage = new JTextField();
     private final JButton btnSend = new JButton("Send");
 
@@ -119,7 +120,8 @@ public class ClientGUI extends JFrame implements ActionListener, Thread.Uncaught
         scrollUsers.setPreferredSize(new Dimension(100, 0));
         cbAlwaysOnTop.addActionListener(this);
         btnLogin.addActionListener(this);
-        btnDisconnect.addActionListener(this); //lesson6
+        btnDisconnect.addActionListener(this);
+        btnChangeNickname.addActionListener(this);
         btnSend.addActionListener(this);
 
         tfMessage.addActionListener(this);
@@ -130,7 +132,10 @@ public class ClientGUI extends JFrame implements ActionListener, Thread.Uncaught
         panelTop.add(tfLogin);
         panelTop.add(tfPassword);
         panelTop.add(btnLogin);
-        panelBottom.add(btnDisconnect, BorderLayout.WEST);
+        JPanel btnPanelWest = new JPanel(new GridLayout(2,1));
+        btnPanelWest.add(btnDisconnect);
+        btnPanelWest.add(btnChangeNickname);
+        panelBottom.add(btnPanelWest, BorderLayout.WEST);
         panelBottom.add(tfMessage, BorderLayout.CENTER);
         panelBottom.add(btnSend, BorderLayout.EAST);
 
@@ -168,6 +173,8 @@ public class ClientGUI extends JFrame implements ActionListener, Thread.Uncaught
             connect();
         }else if (src == btnDisconnect) {
             disconnect();
+        }else if (src == btnChangeNickname) {
+            changeNickname();
         }else if (src == btnSend || src == tfMessage) {
             sendMessage();
         } else {
@@ -196,8 +203,17 @@ public class ClientGUI extends JFrame implements ActionListener, Thread.Uncaught
         }catch (IOException e) {
             putLog(e.getMessage());
         }
-
         socketThread.close();
+    }
+
+    private void changeNickname(){
+
+        String newNickname = JOptionPane.showInputDialog(
+                this,
+                "Введите новый Nickname");
+        if (newNickname != null) {
+
+        }
 
     }
 
@@ -268,7 +284,7 @@ public class ClientGUI extends JFrame implements ActionListener, Thread.Uncaught
             }
 
         }catch (IOException e) {
-            //не чего
+            //ни чего
         }
     }
 
@@ -318,6 +334,8 @@ public class ClientGUI extends JFrame implements ActionListener, Thread.Uncaught
                 userList.setListData(userArray);
                 break;
             }
+
+
 
         }
        /* if (arr.length != 3 || !arr[0].equals(Messages.AUTH_REQUEST)) {
