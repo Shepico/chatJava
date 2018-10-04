@@ -193,10 +193,6 @@ public class ClientGUI extends JFrame implements ActionListener, Thread.Uncaught
 
     }
 
-    /*
-    * lesson6
-    * */
-
     private void disconnect() {
         try {
             bwFile.close();
@@ -221,9 +217,6 @@ public class ClientGUI extends JFrame implements ActionListener, Thread.Uncaught
         panelTop.setVisible(!flagConnect);
         panelBottom.setVisible(flagConnect);
     }
-    /*
-    * end lesson6*/
-
 
     void sendMessage() {
         String msg = tfMessage.getText();
@@ -231,9 +224,6 @@ public class ClientGUI extends JFrame implements ActionListener, Thread.Uncaught
         if ("".equals(msg)) return;
         tfMessage.setText(null);
         tfMessage.requestFocusInWindow();
-        //putLog(String.format("%s", msg));
-//        wrtMsgToLogFile(msg, username);
-        //socketThread.sendString(username + ":" + msg);
         socketThread.sendString(msg);
     }
 
@@ -338,11 +328,6 @@ public class ClientGUI extends JFrame implements ActionListener, Thread.Uncaught
 
 
         }
-       /* if (arr.length != 3 || !arr[0].equals(Messages.AUTH_REQUEST)) {
-            newClient.msgFormatError(msg);
-            return;
-        }
-        if ()*/
     }
 
     @Override

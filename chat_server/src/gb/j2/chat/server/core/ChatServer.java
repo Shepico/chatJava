@@ -6,11 +6,15 @@ import gb.j2.network.ServerSocketThreadListener;
 import gb.j2.network.SocketThread;
 import gb.j2.network.SocketThreadListener;
 
+import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Vector;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.logging.*;
 
 public class ChatServer implements ServerSocketThreadListener, SocketThreadListener{
 
@@ -18,15 +22,37 @@ public class ChatServer implements ServerSocketThreadListener, SocketThreadListe
     private final DateFormat DATEFORMAT = new SimpleDateFormat("HH:mm:ss: ");
     private Vector<SocketThread> clients = new Vector<>(); //lesson6
     private ChatServerListener listener;
+    private static Logger log = Logger.getLogger(ChatServer.class.getName());
 
     public ChatServer(ChatServerListener listener){
+        Handler myHandlerTxt = null;
+        Handler myHandler = new ConsoleHandler();
+        myHandler.setLevel(Level.INFO);
+        log.addHandler(myHandler);
+        log.setLevel(Level.ALL);
+        try {
+            myHandlerTxt = new FileHandler("log-%g.txt");
+        }catch (IOException e){
+            log.log(Level.SEVERE, "log file not created");
+        }
+        myHandlerTxt.setFormatter(new Formatter() {
+            @Override
+            public String format(LogRecord record) {
+                return ((record.getMessage())+"\n");
+            }
+        });
+        myHandlerTxt.setLevel(Level.ALL);
+        log.addHandler(myHandlerTxt);
+        //
         this.listener =listener;
     }
 
     public void start(int port){
         if (server !=null && server.isAlive()) {
+            log.log(Level.INFO,"Server is running");
             putLog("Server is running");
         }else{
+            log.log(Level.INFO,"Server run");
             server = new ServerSocketThread(this,"Chat server", port, 3000);
         }
 
@@ -35,7 +61,9 @@ public class ChatServer implements ServerSocketThreadListener, SocketThreadListe
     public void stop(){
         if (server == null || !server.isAlive()){
             putLog("Server is not running");
+            log.log(Level.INFO, "Server is not runnng");
         }else {
+            log.log(Level.FINE, "Server interrupted");
             server.interrupt();
         }
     }
